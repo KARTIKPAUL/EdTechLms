@@ -2,7 +2,7 @@ import User from "../Models/userModel.js";
 import AppError from "../Utility/errorUtil.js";
 import bcrypt from 'bcryptjs'
 import cloudinary from 'cloudinary'
-//import fs from 'node:fs/promises'
+//import fs from 'fs/promises'
 
 //Cookis setUp
 
