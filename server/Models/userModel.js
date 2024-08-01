@@ -1,98 +1,94 @@
-import mongoose  from "mongoose";
-import bcrypt from 'bcryptjs'
+import { Schema ,model } from "mongoose";
 import jwt from 'jsonwebtoken'
-import { config  } from 'dotenv';
-config();
+import dotenv from 'dotenv';
+dotenv.config();
 import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 
-const userSchema = new mongoose.Schema({
-    fullname:{
+const userSchema = new Schema({
+    fullName : {
         type: String,
-        required: [true, 'Name is required'],
-        minLength: [3,'Name must be at least 5 Character'],
-        maxLength: [50,'Name at most 50 Character'],
+        required:[true, 'Name must be Required'],
+        minLength: [5,'Name Must be 5 Character'],
         lowercase: true,
         trim: true
+
     },
-    email:{
+    email : {
         type: String,
-        required: [true, 'Email is required'],
+        required: [true,'Email Must be Required'],
         lowercase: true,
         trim: true,
         unique: true
     },
-    password:{
+    password : {
         type: String,
-        required: [true, 'Password is required'],
-        minLength: [8,'Password must be at least 8 Character'],
+        required:[true,'Password must be Required'],
+        minLength:[8,'Password Must be 8 Character'],
         select: false
     },
     avater: {
-        public_id: {
-            type: 'String'
+        public_id : {
+            type: String,
         },
         secure_url: {
-            type: 'String'
+            type: String
         }
     },
-    forgetPassword: {
+    forgotPasswordToken: {
         type: String
     },
-    forgetPasswordExpiry: {
+    forgotPasswordExpiry: {
         type: Date
     },
-    role:{
+    role: {
         type: String,
         enum: ['USER','ADMIN'],
-        default: 'USER'
+        default: 'USER',
     }
-},{timestamps: true})
 
 
-//Encrypt Password
+},{timestamps: true});
+
 userSchema.pre('save', async function(next){
-    if(!this.isModified('password')){
-        return next();
-    }
+    if(!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password,10)
 })
 
-
-//Generate JWT Token
 userSchema.methods = {
-    generateJWTToken: async function () {
-        return await jwt.sign(
-          { 
+    generateJWTToken: function(){
+        return jwt.sign(
+        {
             id: this._id,
-            role: this.role, 
-            //subscription: this.subscription 
+            email: this.email,
+            //subcription: this.subcription, 
+            role: this.role
         },
-          process.env.JWT_SECRET,
-          
-        //   {
-        //     expiresIn: process.env.JWT_EXPIRY,
-        //   }
+        process.env.JWT_SECRET,
+        // {
+        //     //expiresIn: process.env.JWT_EXPIRY
+        // }
+       )
+    },
+    comparePassword: async function(plainTextPassword){
+        return await bcrypt.compare(plainTextPassword,this.password)
+    },
+    generatePasswordResetToken: async function(){
+        const resetToken = crypto.randomBytes(20).toString("hex");
 
-        );
-      },
-
-      generatePasswordResetToken: async function() {
-        const resetToken = crypto.randomBytes(20).toString('hex');
-        this.forgetPassword = crypto
-        .createhash('sha256')
+        this.forgotPasswordToken = await crypto
+        .createHash("sha256")
         .update(resetToken)
-        .digest('hex')
-        this.forgetPasswordExpiry = Data.now() + 15 * 60 * 1000
+        .digest("hex")
+        this.generateJWTToken = resetToken;
+        this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000 // 15 Minutes from now
 
         return resetToken;
-      }
+    }
 }
 
 
 
-
-
-
-const User = mongoose.model('User',userSchema)
+const User = model('User',userSchema);
 
 export default User;
