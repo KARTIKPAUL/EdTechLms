@@ -14,7 +14,7 @@ function HomePage(){
             Find Out Best &nbsp; 
             <span className="text-yellow-500 font-bold">OnLine Courses</span>
            </h1>
-           <p className="text-xl text-gray-200">We habe Large Library Of Courses taught by highly skilled and qualified faculty as a very affordabe cost</p>
+           <p className="text-xl text-gray-200">We have Large Library Of Courses taught by highly skilled and qualified faculty as a very affordabe cost</p>
            <div className="space-x-6">
             <Link to='/courses'>
                 <button className="border bg-yellow-500 px-5 py-3 rounded-md text-white font-semibold text-lg cursor-pointer hover:bg-yellow-600 transition-all ease-in-out duration-300">Explore Courses</button>

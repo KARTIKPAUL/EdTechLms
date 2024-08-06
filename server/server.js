@@ -4,7 +4,7 @@ import connectionToDb from './Config/dbConnect.js';
 dotenv.config();
 import clodinary from 'cloudinary'
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 clodinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

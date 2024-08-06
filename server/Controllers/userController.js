@@ -84,33 +84,38 @@ const register = async (req,res,next) => {
     }
 }
 
-const login = async (req,res,next) => {
+const login = async (req, res, next) => {
+    const {email, password} = req.body;
     try {
-        const {email , password} = req.body;
 
-    if(!email || !password){
-        return next (new AppError('All Fields are Required',400))
-    }
+        //check if user miss any field
+        if (!email || !password) {
+            return next(new AppError('All fields are required', 400));
+        }
 
-    const user = await User.findOne({email}).select('+password');
+        const user = await User.findOne({ email }).select('+password');
 
-    if(!user || !user.comparePassword(password)){
-        return next (new AppError('Email Or Password Not Match',400))
-    }
+        if (!user || !(bcrypt.compareSync(password, user.password))) {
+            return next(new AppError('Email or Password does not match', 400))
+        }
 
-    const token = user.generateJWTToken();
-    user.password = undefined;
-    res.cookie('token',token,cookieOptions);
+        const token = await user.generateJWTToken();
 
-    res.status(200).json({
-        sucess: true,
-        message: 'User Login Sucessfulli !!',
-        user
-    })
-    } catch (error) {
-        return next (new AppError(`Error Happen When Trying Login ${error.message}`,500))
+       user.password = undefined;
+
+       res.cookie('token', token, cookieOptions)
+
+        res.status(200).json({
+            success: true,
+            message: 'User loggedin successfully',
+            user
+        })
+    } catch (e) {
+        return next(new AppError(e.message, 500))
     }
 }
+
+
 
 const logout = (req,res) => {
     res.cookie('token', null,{

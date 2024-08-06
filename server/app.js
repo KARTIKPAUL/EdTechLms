@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import morgan from 'morgan';
 dotenv.config();
 import userRoutes from './Routes/userRoutes.js'
+import courseRoutes from './Routes/courseRoutes.js'
 import errorMiddleware from './Middlewares/errorMiddleware.js';
 
 
@@ -27,8 +28,9 @@ app.use('/home',(req,res) => {
 })
 
 app.use('/api/v1/user',userRoutes)
+app.use('/api/v1/courses',courseRoutes)
 
-app.use('/*',(req,res) => {
+app.use('*',(req,res) => {
     res.send('Not Found Any Page')
 })
 

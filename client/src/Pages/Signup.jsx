@@ -4,6 +4,7 @@ import { BsPersonCircle } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {toast} from 'react-hot-toast'
+import { createAccount } from "../Redux/Slices/authSlice";
 
 function Signup(){
     const dispatch = useDispatch();
@@ -25,7 +26,7 @@ function Signup(){
     }
 
     function getImage(event){
-        event.pveventDefault();
+        event.preventDefault();
         const uploadImage = event.target.files[0];
 
         if(uploadImage){
@@ -36,24 +37,65 @@ function Signup(){
             const fileReader = new FileReader();
             fileReader.readAsDataURL(uploadImage);
             fileReader.addEventListener('load',function(){
-                console.log(this.result);
+                //console.log(this.result);
                 setPreviewImage(this.result)
             })
         }
     }
 
-    function createNewAccount(event){
+    async function createNewAccount(event) {
         event.preventDefault();
-        if(!signupData.email || !signupData.fullName || !signupData.password || !signupData.avater){
-            toast.error('Please Fill All The Fields');
-            return;
+        if (!signupData.email || !signupData.password || !signupData.fullName) {
+          toast.error("Please fill all the details");
+          return;
         }
-    }
+    
+        // checking name field length
+        if (signupData.fullName.length < 5) {
+          toast.error("Name should be atleast of 3 characters");
+          return;
+        }
+        //checking valid email
+        if (!signupData.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g)) {
+          toast.error("Invalid email id");
+          return;
+        }
+    
+        if (signupData.password.length < 8) {
+            toast.error("Password should be atleast of 8 characters");
+            return;
+          }
+
+        const formData = new FormData();
+        formData.append("fullName", signupData.fullName);
+        formData.append("email", signupData.email);
+        formData.append("password", signupData.password);
+        formData.append("avater", signupData.avater);
+    
+        // dispatch create account action
+        const response = await dispatch(createAccount(formData));
+        console.log(response);
+        
+        if (response?.payload?.sucess){
+          navigate("/");
+        
+          setSignupData({
+            fullName: "",
+            email: "",
+            password: "",
+            avatar: "",
+          });
+          setPreviewImage("");
+
+        }
+
+        }
+
 
     return(
         <HomeLayout>
         <div className="flex items-center justify-center h-[100vh]">
-            <form onSubmit={createNewAccount} className="flex flex-col justify-center gap-3 rounded-lg p-4 text-white w-96 shadow-[0_0_black]">
+            <form onSubmit={createNewAccount} className="flex flex-col justify-center gap-3 rounded-lg p-4 text-white w-96 shadow-[0_0_10px_black]">
                 <h1 className="text-center text-2xl font-bold">Registration Page</h1>
 
                 <label htmlFor="image_uploads" className="cursor-pointer">
@@ -68,9 +110,10 @@ function Signup(){
                     onChange={getImage}
                     className="hidden" 
                     type='file' 
-                    id="fileUpload"
+                    id="image_uploads"
                     name="image_uploads"
                     accept=".jpg,.jpeg,.png,.svg"
+                    required
                     />
 
                 <div className="flex flex-col gap-1">
