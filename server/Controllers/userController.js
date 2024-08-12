@@ -5,14 +5,20 @@ import cookieParser from "cookie-parser";
 import sendEmail from "../Utility/sendEmail.js";
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import fs from 'fs/promises'
+import dotenv from 'dotenv'
+dotenv.config();
+import jwt from 'jsonwebtoken'
 
 // import fs from 'promisefs';
 
 const cookieOptions = {
-    maxAge: 7 * 24 * 60 * 1000, //7 Days
-    httpOnly: true,
-    secure: true
-}
+    httpOnly: true,  // Prevents client-side JavaScript from accessing the cookie (helps mitigate XSS attacks)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days
+    secure: true,  // Ensures the cookie is only sent over HTTPS connections
+    sameSite: 'none' // Allows cross-site requests, needed for sharing cookies between different domains
+};
+
 
 const register = async (req,res,next) => {
     try{
@@ -60,7 +66,7 @@ const register = async (req,res,next) => {
 
                 //Remove File From Local Or Server
 
-                //fs.rm(`uploads\${req.file.filename}`);
+                fs.rm(`uploads/${req.file.filename}`)
 
             }
         } catch (error) {
@@ -80,15 +86,13 @@ const register = async (req,res,next) => {
         user,
     })
     } catch (error) {
-        return next(new AppError(error.message, 500));
+        return next(new AppError('Error Happening Whwn Creating Account', error.message, 500));
     }
 }
 
 const login = async (req, res, next) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     try {
-
-        //check if user miss any field
         if (!email || !password) {
             return next(new AppError('All fields are required', 400));
         }
@@ -96,24 +100,28 @@ const login = async (req, res, next) => {
         const user = await User.findOne({ email }).select('+password');
 
         if (!user || !(bcrypt.compareSync(password, user.password))) {
-            return next(new AppError('Email or Password does not match', 400))
+            return next(new AppError('Email or Password does not match', 400));
         }
 
         const token = await user.generateJWTToken();
 
-       user.password = undefined;
+        user.password = undefined;
 
-       res.cookie('token', token, cookieOptions)
+        res.cookie('token', token, cookieOptions);
+
+        console.log('User logged in successfully');
+        console.log(token);
 
         res.status(200).json({
             success: true,
-            message: 'User loggedin successfully',
-            user
-        })
+            message: 'User logged in successfully',
+            user,
+        });
     } catch (e) {
-        return next(new AppError(e.message, 500))
+        return next(new AppError(e.message, 500));
     }
-}
+};
+
 
 
 
@@ -125,7 +133,7 @@ const logout = (req,res) => {
     })
 
     res.status(200).json({
-        sucess: true,
+        success: true,
         message: 'User Logged Out Sucessfully !!'
     })
 }
@@ -136,7 +144,7 @@ const getProfile = async (req,res,next) => {
         const user = await User.findOne({userId});
 
         res.status(200).json({
-            sucess: true,
+            success: true,
             message: 'User Fetch Sucessfully !!',
             user
         })
@@ -170,7 +178,7 @@ const forgotPassword = async (req,res,next) => {
     try {
         await sendEmail(email,subject,message);
         res.status(200).json({
-            sucsess: true,
+            success: true,
             message: `Reset Password Email Send To ${email} Sucessfully !!`
         })
     } catch (error) {
@@ -245,54 +253,59 @@ const changePassword = async (req,res,next) => {
     })
 }
 
-const updateUser = async (req,res,next) => {
-    const {email,fullName} = req.body;
-    //const {id} = req.user.id;
+const updateUser = async (req, res, next) => {
+    try {
+        const { fullName } = req.body;
+        console.log(fullName);
+        const { id } = req.user; // `req.user` should now be populated by the middleware
+        console.log(id);
 
-    const user = await User.findOne({email});
-    if(!user){
-        return next(new AppError('user Not Exists',400));
-    }
+        const user = await User.findById(id);
 
-    // if(req.fullName){
-    //     user.fullName = fullName;
-    // }
-
-    user.fullName = fullName;
-
-    if(req.file){
-        await cloudinary.v2.uploader.destroy(user.avater.public_id);
-        try {
-            const result =await cloudinary.v2.uploader.upload(req.file.path,{
-                folder: 'FinalLms',
-                width: 250,
-                height: 250,
-                gravity: 'faces',
-                crop: 'fill'
-            });
-
-            if(result){
-                user.avater.public_id = result.public_id;
-                user.avater.secure_url = result.secure_url;
-
-                //Remove File From Local Or Server
-
-                //fs.rm(`uploads\${req.file.filename}`);
-
-            }
-        } catch (error) {
-            return next(new AppError(`error Happen When File Uploaded ! ${error.message}`,400))
+        if (!user) {
+            return next(new AppError('User does not exist', 400));
         }
+
+        if (fullName) {
+            user.fullName = fullName;
+        }
+
+        if(req.file){
+            console.log(req.file);
+            try {
+                const result =await cloudinary.v2.uploader.upload(req.file.path,{
+                    folder: 'FinalLms',
+                    width: 250,
+                    height: 250,
+                    gravity: 'faces',
+                    crop: 'fill'
+                });
+    
+                if(result){
+                    user.avater.public_id = result.public_id;
+                    user.avater.secure_url = result.secure_url;
+    
+                    //Remove File From Local Or Server
+    
+                    fs.rm(`uploads/${req.file.filename}`)
+    
+                }
+            } catch (error) {
+                return next(new AppError(`error Happen When File Uploaded ! ${error.message}`,400))
+            }
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'User details updated successfully!',
+        });
+    } catch (error) {
+        return next(new AppError(`Profile not updated: ${error.message}`, 500));
     }
+};
 
-    await user.save();
-
-    res.status(200).json({
-        success: true,
-        message: 'User Details Update Sucessfully !!'
-    })
-
-}
 
 export {
     login,logout,getProfile,register,forgotPassword,resetPassword,changePassword , updateUser

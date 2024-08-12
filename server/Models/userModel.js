@@ -44,7 +44,7 @@ const userSchema = new Schema({
     role: {
         type: String,
         enum: ['USER','ADMIN'],
-        default: 'USER',
+        default: 'ADMIN',
     }
 
 
@@ -56,18 +56,18 @@ userSchema.pre('save', async function(next){
 })
 
 userSchema.methods = {
-    generateJWTToken: function(){
+    generateJWTToken: function() {
         return jwt.sign(
         {
             id: this._id,
             email: this.email,
-            //subcription: this.subcription, 
+            subcription: this.subcription, 
             role: this.role
         },
         process.env.JWT_SECRET,
-        // {
-        //     //expiresIn: process.env.JWT_EXPIRY
-        // }
+        {
+            expiresIn: '60d'
+        }
        )
     },
     comparePassword: async function(plainTextPassword){

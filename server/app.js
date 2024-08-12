@@ -8,6 +8,9 @@ dotenv.config();
 import userRoutes from './Routes/userRoutes.js'
 import courseRoutes from './Routes/courseRoutes.js'
 import errorMiddleware from './Middlewares/errorMiddleware.js';
+import bodyParser from 'body-parser'
+// import passport from 'passport';
+// import session from 'express-session';
 
 
 
@@ -22,6 +25,18 @@ app.use(cors({
 app.use(morgan('dev'))
 
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+// app.use(session({
+//     secret: process.env.SESSION_SECRET, // Replace with your own secret
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: { secure: process.env.NODE_ENV === 'production' } // Secure cookies in production
+// }));
+
 
 app.use('/home',(req,res) => {
     res.send('Hello')
@@ -33,6 +48,8 @@ app.use('/api/v1/courses',courseRoutes)
 app.use('*',(req,res) => {
     res.send('Not Found Any Page')
 })
+
+
 
 app.use(errorMiddleware)
 

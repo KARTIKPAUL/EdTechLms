@@ -4,6 +4,7 @@ import {AiFillCloseCircle} from 'react-icons/ai'
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import { useDispatch, useSelector } from 'react-redux'
+import { logout } from "../Redux/Slices/authSlice";
 
 function HomeLayout({children}){
 
@@ -29,9 +30,9 @@ function HomeLayout({children}){
         drawerSide[0].style.width = '0'
     }
 
-    function handleLogout(e){
+    async function handleLogout(e){
         e.preventDefault();
-        //const res = await dispatch(logout());
+        const res = await dispatch(logout());
         if(res?.payload?.success)navigate('/')
     }
 
@@ -65,6 +66,13 @@ function HomeLayout({children}){
                             <Link to='/admin/dashboard'>Admin DashBoard</Link>
                         </li>
                     )}
+
+                    {isLoggedIn && role === 'ADMIN' && (
+                        <li>
+                            <Link to='/course/create'>Create New Course</Link>
+                        </li>
+                    )}
+
                     <li>
                         <Link to='/courses'>Courses</Link>
                     </li>
