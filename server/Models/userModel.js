@@ -44,7 +44,11 @@ const userSchema = new Schema({
     role: {
         type: String,
         enum: ['USER','ADMIN'],
-        default: 'ADMIN',
+        default: 'USER',
+    },
+    subscription: {
+        id: String,
+        status: String
     }
 
 
@@ -61,7 +65,7 @@ userSchema.methods = {
         {
             id: this._id,
             email: this.email,
-            subcription: this.subcription, 
+            subscription: this.subscription, 
             role: this.role
         },
         process.env.JWT_SECRET,

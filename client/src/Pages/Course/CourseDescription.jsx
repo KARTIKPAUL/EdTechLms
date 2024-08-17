@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import HomeLayout from "../../Layouts/HomeLayot";
 import { useSelector } from "react-redux";
 import { buildCreateSlice } from "@reduxjs/toolkit";
@@ -7,6 +7,7 @@ import { buildCreateSlice } from "@reduxjs/toolkit";
 function CourseDescription(){
 
     const {state} = useLocation();
+    const navigate = useNavigate();
 
     // useEffect(() => {
     //     console.log(state);
@@ -40,7 +41,7 @@ function CourseDescription(){
                                     data?.role === 'ADMIN' || data?.subcription?.status === 'Active' ? (
                                             <button className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5">Watch Lectues</button>
                                     ) : (
-                                        <button className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5">Subcribe</button>
+                                        <button className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5" onClick={() => navigate('/checkout')}>Subcribe</button>
                                     )
                                 }
 

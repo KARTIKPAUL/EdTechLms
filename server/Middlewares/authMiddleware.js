@@ -28,7 +28,18 @@ const authorisedRoles = (...roles) => async (req, res, next) => {
     next();
 }
 
+// const authoriseddSibcriber = async(req,res,next) => {
+//     const subcription = req.user.subcription;
+//     const currentUserRoles = req.user.role;
+//     if(currentUserRoles !== 'ADMIN' && subcription.status !== 'active'){
+//         return next(
+//             new AppError('Please Subcribe to Access Course',403)
+//         )
+//     }
+// }
+
 export {
     isLoggedIn,
     authorisedRoles,
+    //authoriseddSibcriber
 }

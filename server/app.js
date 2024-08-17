@@ -7,6 +7,7 @@ import morgan from 'morgan';
 dotenv.config();
 import userRoutes from './Routes/userRoutes.js'
 import courseRoutes from './Routes/courseRoutes.js'
+import paymentRoutes from './Routes/paymentRoutes.js'
 import errorMiddleware from './Middlewares/errorMiddleware.js';
 import bodyParser from 'body-parser'
 // import passport from 'passport';
@@ -43,7 +44,8 @@ app.use('/home',(req,res) => {
 })
 
 app.use('/api/v1/user',userRoutes)
-app.use('/api/v1/courses',courseRoutes)
+app.use('/api/v1/courses',courseRoutes);
+app.use('/api/v1/payments',paymentRoutes)
 
 app.use('*',(req,res) => {
     res.send('Not Found Any Page')
