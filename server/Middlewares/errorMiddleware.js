@@ -4,7 +4,7 @@ const errorMiddleware = (err,req,res,next) => {
     err.message = err.message || 'Something Went Wrong'
      
     res.status(err.statusCode).json({
-        sucess: false,
+        success: false,
         message: `Error Are Happen There , ${err.message}`,
         stack: err.stack
     })

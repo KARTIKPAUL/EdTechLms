@@ -1,15 +1,27 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import HomeLayout from "../../Layouts/HomeLayot";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { buildCreateSlice } from "@reduxjs/toolkit";
+import { getUserData } from "../../Redux/Slices/authSlice";
+import { cancelCourseBundle } from "../../Redux/Slices/razorpaySlice";
+import toast from "react-hot-toast";
 
 function Profile(){
 
     const userData = useSelector((state) => state?.auth?.data);
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     
+    async function handlcancellation(){
+        toast("Initiating cancellation");
+        await dispatch (cancelCourseBundle());
+        await dispatch(getUserData());
+
+        toast.success("Cancellation Completed");
+        navigate("/");
+
+    }
 
     return(
         <HomeLayout>
@@ -27,7 +39,7 @@ function Profile(){
                         <br />
                         <p>Role : {userData?.role}</p>
                         <br />
-                        <p>Subscription : {userData?.subcription?.status === 'active' ? 'Active' : 'Inactiive'}</p>
+                        <p>Subscription : {userData?.subscription?.status === 'active' ? 'Active' : 'Inactiive'}</p>
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
@@ -42,8 +54,8 @@ function Profile(){
 
                     </div>
 
-                {userData?.subcription?.status !== 'active' && (
-                        <button className="w-full bg-red-600 hover:bg-red-500 transition-all ease-in-out duration-300 rounded-sm font-semibold py-2 cursor-pointer text-center">Cancel Subscription</button>
+                {userData?.subscription?.status === 'active' && (
+                        <button onClick={handlcancellation} className="w-full bg-red-600 hover:bg-red-500 transition-all ease-in-out duration-300 rounded-sm font-semibold py-2 cursor-pointer text-center">Cancel Subscription</button>
                 )}
                 </div>
             </div>

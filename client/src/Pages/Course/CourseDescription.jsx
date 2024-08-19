@@ -13,7 +13,7 @@ function CourseDescription(){
     //     console.log(state);
     // },[])
 
-    const {data, role , subcription} = useSelector((state) => state.auth);
+    const {data, role , subscription} = useSelector((state) => state.auth);
 
     return(
         <HomeLayout>
@@ -38,8 +38,8 @@ function CourseDescription(){
                                 </p>
                                 
                                 {
-                                    data?.role === 'ADMIN' || data?.subcription?.status === 'Active' ? (
-                                            <button className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5">Watch Lectues</button>
+                                    data?.role === 'ADMIN' || data?.subscription?.status === 'active' ? (
+                                            <button onClick={() => navigate("/course/displaylectures",{state: {...state}})} className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5">Watch Lectues</button>
                                     ) : (
                                         <button className="bg-yellow-500 text-xl rounded-md font-bold px-5 py-3 w-full hover:bg-yellow-600 transition-all ease-in-out duration-200 mt-5" onClick={() => navigate('/checkout')}>Subcribe</button>
                                     )

@@ -16,7 +16,7 @@ router.route('/')
 router.route('/:id')
     .get(
         isLoggedIn,
-        authorisedRoles('ADMIN'),
+        //authorisedRoles('USER'),
         getLectureByCourseId
     )
     .put(

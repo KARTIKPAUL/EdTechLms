@@ -1,3 +1,4 @@
+import User from "../Models/userModel.js";
 import AppError from "../Utility/errorUtil.js";
 import jwt from 'jsonwebtoken'
 
@@ -28,18 +29,25 @@ const authorisedRoles = (...roles) => async (req, res, next) => {
     next();
 }
 
-// const authoriseddSibcriber = async(req,res,next) => {
-//     const subcription = req.user.subcription;
-//     const currentUserRoles = req.user.role;
-//     if(currentUserRoles !== 'ADMIN' && subcription.status !== 'active'){
-//         return next(
-//             new AppError('Please Subcribe to Access Course',403)
-//         )
-//     }
-// }
+const authoriseddSusbcriber = async(req,res,next) => {
+    //const subcription = req.user.subcription
+    //const currentUserRoles = req.user.role;
+
+    const {role ,id} = req.user;
+    const user = await User.findById(id);
+    const subcriptionStatus = user.subscription.status;
+    console.log(subcriptionStatus);
+    console.log(user);
+    if(role !== 'ADMIN' && subcriptionStatus !== 'active'){
+        return next(
+            new AppError('Please Subscribe to Access Course',403)
+        )
+    }
+    next();
+}
 
 export {
     isLoggedIn,
     authorisedRoles,
-    //authoriseddSibcriber
+    authoriseddSusbcriber
 }

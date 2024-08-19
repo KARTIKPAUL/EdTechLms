@@ -3,8 +3,7 @@ import AppError from "../Utility/errorUtil.js";
 import cloudinary from 'cloudinary'
 import fs from 'fs/promises'
 
-const getAllCourses = async function(req,res,next){
-    
+const getAllCourses = async function(req,res,next) {
     try {
         const courses = await Course.find({})
         .select('-lectures');
@@ -17,18 +16,17 @@ const getAllCourses = async function(req,res,next){
     } catch (error) {
         return next(new AppError(`Fetching Course failed !!,${error.message}`,400))
     }
-
 }
 
 const getLectureByCourseId = async function(req,res,next){
     try {
-        const {id} = req.params;
-
+        const { id } = req.params;
         const course = await Course.findById(id);
+        console.log(id);
+        
 
         if(!course){
             console.log(id);
-            
             return next(new AppError(`Course Not Found !!,${error.message}`,400))
         }
 
@@ -37,6 +35,8 @@ const getLectureByCourseId = async function(req,res,next){
             message: 'Course lecture Fetched Sucesshully',
             lectures: course.lectures
         })
+        
+
     } catch (error) {
         return next(new AppError(`Getting Course failed !!,${error.message}`,400))
     }
@@ -124,7 +124,7 @@ const updateCourse = async function(req,res,next) {
 
 const removeCourse = async function(req,res,next) {
     try {
-       const {id}= req.params;
+       const { id }= req.params;
        const course = await Course.findById(id);
        if(!id){
         return next(new AppError(`Course With Given Id Does Not Exists `,400));
@@ -142,6 +142,7 @@ const removeCourse = async function(req,res,next) {
 }
 
 const addLectureToCourseById = async function(req,res,next) {
+
     const {title,description} = req.body;
 
     const {id} = req.params;

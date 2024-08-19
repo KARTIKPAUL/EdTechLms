@@ -4,6 +4,7 @@ import AppError from "../Utility/errorUtil.js";
 import crypto from 'crypto'
 import Payment from "../Models/paymentModel.js";
 import dotenv from 'dotenv'
+import { log } from "console";
 dotenv.config();
 
 const getRazorpayApiKey = async(req,res,next) => {
@@ -111,10 +112,10 @@ const verifySubscription = async (req, res, next) => {
 }
 
 const cancelSubscription = async(req,res,next) => {
-    try {
+    
         const {id} = req.user;
         const user = await User.findById(id);
-        //console.log('User Fetch Successfully');
+        console.log('User Fetch Successfully');
         
 
         if(!user){
@@ -124,30 +125,36 @@ const cancelSubscription = async(req,res,next) => {
         if (user.role === 'ADMIN'){
         return next(new AppError('Admin Can not purchase subscription',400))
         }
-        //console.log(user.role);
+        console.log(user.role);
         
 
         const subcsriptionId = user.subscription.id;
-        //console.log(subcsriptionId);
+        console.log(user.subscription.status);
+        console.log(subcsriptionId);
+        
+        
 
-        const subcription = await razorpay.subscriptions.cancel({
-        subcsriptionId
-        })
-
-        user.subscription.status = subcription;
-   
+        
+        try {
+            const subscription = await razorpay.subscriptions.cancel(
+                subcsriptionId
+            );
     
+            user.subscription.status = subscription.status;
+    
+            await user.save();
 
-    res.status(200).json({
-        success: true,
-        message: 'Unscubscribe Successfullly !!'
-    })
+            res.status(200).json({
+                success: true,
+                message: "Unsubcribe Successfully",
+    
+            })
 
-    await user.save();
-    } catch (error) {
-        return  next(new AppError(error.message,400))
-    }
+            
 
+        } catch (error) {
+            return next(new AppError(error.message, 500));
+        }
 }
 
 const allPayments = async(req,res,next) => {

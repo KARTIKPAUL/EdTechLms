@@ -69,7 +69,7 @@ export const cancelCourseBundle = createAsyncThunk("/payments/cancel", async () 
             success: (data) => {
                 return data?.data?.message
             },
-            error: "Failed to ubsubscrive"
+            error: "Failed to unsubscrive"
         })
         return (await response).data;
     } catch(error) {
