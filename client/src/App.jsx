@@ -17,6 +17,7 @@ import Checkout from './Pages/Payment/Checkout'
 import CheckoutSuccess from './Pages/Payment/CheckoutSuccess'
 import CheckoutFail from './Pages/Payment/CheckoutFail'
 import Displaylecture from './Pages/Dashboard/Displaylecture'
+import AddLecture from './Pages/Dashboard/AddLecture'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path='/course/description' element = {<CourseDescription />}></Route>
         <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}>
           <Route path="/course/create" element={<CreateCourse />} />
+          <Route path='/course/addlecture' element = {<AddLecture />}></Route>
         </Route>
 
         <Route element={<RequireAuth allowedRoles={["ADMIN",'USER']} />}>

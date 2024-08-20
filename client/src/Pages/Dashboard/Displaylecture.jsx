@@ -36,7 +36,8 @@ function Displaylecture(){
                 <div className="text-center text-2xl font-semibold text-yellow-500">
                     Course Name : {state.title}
                 </div>
-                { lectures && lectures.length > 0  && <div className="flex justify-center gap-10 w-full">
+                { ( lectures && lectures.length > 0 ) ? 
+                (<div className="flex justify-center gap-10 w-full">
 
                    <div className="space-y-5 w-[28rem] p-2 rounded-lg shadow-[0_0_10px_black]">
                         <video 
@@ -79,7 +80,8 @@ function Displaylecture(){
                                 </p>
 
                                 {role === 'ADMIN' && (
-                                <button onClick={() => onLectureDelete(state?._id, lecture?._id)} className="bg-red-600 hover:bg-red-500 transition-all ease-in-out duration-300 rounded font-semibold py-2 cursor-pointer text-center px-2">Delete Lecture</button>
+                                <button onClick={() => onLectureDelete(state?._id, lecture?._id)} 
+                                className="bg-red-600 hover:bg-red-500 transition-all ease-in-out duration-300 rounded font-semibold py-2 cursor-pointer text-center px-2">Delete Lecture</button>
                             )}
 
                                 </li> 
@@ -88,7 +90,12 @@ function Displaylecture(){
                     }
                     </ul>
 
-                </div>}
+                </div>) : (
+                        role && role === 'ADMIN' && (
+                            <button onClick={() => navigate("/course/addlecture",{state: {...state}})}
+                            className="bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded font-semibold py-2 cursor-pointer text-center px-2">Add New Lecture</button>
+                    )
+                )}
             </div>
         </HomeLayout>
     )

@@ -143,7 +143,8 @@ const removeCourse = async function(req,res,next) {
 
 const addLectureToCourseById = async function(req,res,next) {
 
-    const {title,description} = req.body;
+    try {
+        const {title,description} = req.body;
 
     const {id} = req.params;
 
@@ -165,10 +166,7 @@ const addLectureToCourseById = async function(req,res,next) {
     if(req.file){
         const result = await cloudinary.v2.uploader.upload(req.file.path,{
             folder: 'FinalLms',
-            width: 250,
-            height: 250,
-            gravity: 'faces',
-            crop: 'fill'
+            resource_type: "video"
         })
         if(result){
             lectureData.lecture.public_id = result.public_id;
@@ -186,10 +184,12 @@ const addLectureToCourseById = async function(req,res,next) {
     res.status(200).json({
         success: true,
         message: 'Lecture Uploaded Succcesfully',
-       course 
+        course 
     })
 
-
+    } catch (error) {
+        return next(new AppError(error.message, 500));
+    }
 }
 
 // const removeLecture = async (req,res,next) {

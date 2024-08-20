@@ -69,7 +69,7 @@ const lectureSlice = createSlice({
         })
         .addCase(addCourseLecture.fulfilled, (state, action) => {
             console.log(action);
-            state.lectures = action?.payload?.course?.lectures;
+            state.lectures = action?.payload?.lectures;
         })
     }
 });
