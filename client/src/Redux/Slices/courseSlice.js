@@ -5,6 +5,20 @@ const initialState = {
     courseData: []
 }
 
+export const deleteCourses = createAsyncThunk("/courses/delete",async(id) => {
+    try {
+        const response = axioInstance.delete(`/courses/${id}`);
+        toast.promise(response,{
+            loading: 'Deleting Course data',
+            success: 'Course Deleted Successfuly !!',
+            error: 'Failed To Delete The Course'
+        })
+        return (await response).data;
+    } catch (error) {
+        toast.error(error?.response?.data?.message);
+    }
+})
+
 export const getAllCourses = createAsyncThunk("/courses/get",async() => {
     try {
         const response = axioInstance.get("/courses");
